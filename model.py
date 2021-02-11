@@ -154,7 +154,7 @@ def save_checkpoint(model, class_to_index, optimizer, epochs, outputs, hidden_la
 
 
 def load_checkpoint(file_path, device):
-    ''' Loads a checkpoint onto a new model based on the checkpoint's configuration
+    """ Loads a checkpoint onto a new model based on the checkpoint's configuration
 
         Arguments
         ---------
@@ -165,15 +165,11 @@ def load_checkpoint(file_path, device):
         -------
         model: A pre-trained model with a state derived from the provided checkpoint
         checkpoint: The checkpoint used to load the model in case the caller needs additional stored information
-    '''
+    """
 
-    valid_devices = ['cpu', 'cuda']
     device = device.lower()
-    if device not in valid_devices:
-        raise Exception(f"Invalid device '{device}'! Valid options are: {valid_devices}")
-
-    checkpoint = None
-    pretrained_model = None
+    if device not in icc.DEVICES:
+        raise Exception(f"Invalid device '{device}'! Valid options are: {icc.DEVICES}")
 
     if device == 'cpu':
         checkpoint = torch.load(file_path, map_location=device)
@@ -193,24 +189,3 @@ def load_checkpoint(file_path, device):
 
     return pretrained_model, checkpoint
 
-
-def main():
-    vgg19 = models.vgg19_bn(pretrained=True)
-    alexnet = models.alexnet(pretrained=True)
-    resnet50 = models.resnet50(pretrained=True)
-    print("ORIGINAL PRE-TRAINED")
-    print(f"VGG19: \n {vgg19}\n")
-    print(f"AlexNet: \n {alexnet}\n")
-    print(f"ResNet50: \n {resnet50}\n")
-
-    print("\nMODIFIED PRE-TRAINED (REPLACED CLASSIFIERS)\n")
-    vgg19_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.VGG19_BN], [600, 400], 102, 0.2, True)
-    alexNet_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.ALEXNET], [600, 400], 102, 0.2, True)
-    resnet50_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.RESNET_50], [600, 400], 102, 0.2, True)
-    print(f"VGG19: \n {vgg19_a}\n")
-    print(f"AlexNet: \n {alexNet_a}\n")
-    print(f"ResNet50: \n {resnet50_a}\n")
-
-
-if __name__ == '__main__':
-    main()
