@@ -10,6 +10,10 @@ from PIL import Image
 def pre_process_image(image_path):
     """ Scales, crops, and normalizes a PIL image for a PyTorch model,
         returns an Numpy array
+
+        :param image_path: path to the image to pre-process
+
+        :returns: image that has been scaled, cropped (224 x 224), and normalized
     """
     image = Image.open(image_path)
 

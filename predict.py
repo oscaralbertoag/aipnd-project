@@ -13,9 +13,7 @@ import json
 def get_predict_arguments():
     """ Fetches all necessary inputs from the user
 
-        Returns
-        -------
-        Namespace object containing all key-value pairs for user input arguments
+        :returns: namespace object containing all key-value pairs for user input arguments
     """
 
     parser = argparse.ArgumentParser(description='Uses a pre-trained model to make a prediction on an image')
@@ -35,15 +33,12 @@ def get_predict_arguments():
 def predict(image_path, model, device, top_k=5):
     """ Predict the class (or classes) of an image using a trained deep learning model.
 
-        Arguments
-        ---------
         :param image_path: path to the image to load and run through our model prediction
         :param model: pre-trained model to use for flower category prediction
         :param top_k: number of top identified classes to return
         :param device: determines where prediction will be executed; values are 'cuda' or 'cpu'
 
-        Returns
-        -------
+        :return:
         top_probabilities: top K probabilities predicted by the model
         top_classes: top K classes predicted by the model
     """

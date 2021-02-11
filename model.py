@@ -12,6 +12,11 @@ import torch
 
 
 def determine_device(gpu_selected):
+    """ Determines the device to be used based on requested device and available device
+
+    :param gpu_selected: boolean value provided by the user
+    :return: device to be used based on choice and availability
+    """
     if gpu_selected and torch.cuda.is_available():
         device = "cuda"
     else:
@@ -24,14 +29,9 @@ def determine_device(gpu_selected):
 def freeze_pretrained_model_params(pretrained_model):
     """ Freezes all pre-trained model params
 
-        Arguments
-        ---------
-        pretrained_model: a pre-trained model
+        :param pretrained_model: a pre-trained model
 
-        Returns
-        -------
-        pretrained_model: same provided model with frozen parameters
-
+        :return: same provided model with frozen parameters
     """
     for param in pretrained_model.parameters():
         param.requires_grad = False
@@ -39,7 +39,11 @@ def freeze_pretrained_model_params(pretrained_model):
 
 
 def fetch_feedforward_classifier_parameters(model, architecture):
-    params = None
+    """ Fetches parameters for one of the 3 feed-forward classifiers created in this module
+    :param model: contains the parameters to fetch
+    :param architecture: name of the chosen architecture
+    :return: model parameters
+    """
     if architecture == icc.SUPPORTED_ARCHITECTURES[icc.RESNET_50]:
         params = model.fc.parameters()
     else:
@@ -51,16 +55,12 @@ def fetch_feedforward_classifier_parameters(model, architecture):
 def build_feedforward_classifier(input_units, hidden_layer_inputs, output_units, dropout):
     """ Builds a feed-forward classifier based on the provided arguments. The output uses 'LogSoftmax'
 
-        Arguments
-        ---------
-        input_units: number of input units received by this classifier
-        hidden_layer_inputs: list containing input units for each hidden layer to be added
-        output_units: number of output units for this classifier
-        dropout: dropout value to be used for each applicable layer
+        :param input_units: number of input units received by this classifier
+        :param hidden_layer_inputs: list containing input units for each hidden layer to be added
+        :param output_units: number of output units for this classifier
+        :param dropout: dropout value to be used for each applicable layer
 
-        Returns
-        -------
-        A feed-forward classifier
+        :return: A feed-forward classifier
     """
 
     all_layer_inputs = [input_units] + hidden_layer_inputs
@@ -85,17 +85,13 @@ def build_model(architecture, classifier_hidden_units_list, classifier_outputs, 
     """ Loads a pre-trained model based on the provided architecture, and replaces the model classifier with a
         feed-forward classifier based on the provided hidden layers input units and number of outputs
 
-        Arguments
-        ---------
-        architecture: pre-trained model architecture to use. Valid values are 'alexnet', 'vgg19-bn', and 'resnet50'
-        classifier_hidden_units_list: list of hidden layer inputs to use. e.g. [100, 50, 25] would use 3 hidden layers
+        :param architecture: pre-trained model architecture to use. Valid values are 'alexnet', 'vgg19-bn', and 'resnet50'
+        :param classifier_hidden_units_list: list of hidden layer inputs to use. e.g. [100, 50, 25] would use 3 hidden layers
                                       with 100, 50, and 25 input units each
-        classifier_outputs: number of outputs for this model's feed forward classifier
-        dropout: dropout value to be used to all layers except the last one
+        :param classifier_outputs: number of outputs for this model's feed forward classifier
+        :param dropout: dropout value to be used to all layers except the last one
 
-        Returns
-        -------
-        A pre-trained model (frozen params) with a feed-forward classifier defined by the provided arguments
+        :return: a pre-trained model (frozen params) with a feed-forward classifier defined by the provided arguments
     """
 
     architecture = architecture.lower()
@@ -128,6 +124,17 @@ def build_model(architecture, classifier_hidden_units_list, classifier_outputs, 
 
 def save_checkpoint(model, class_to_index, optimizer, epochs, outputs, hidden_layers, dropout, architecture,
                     checkpoint_dir):
+    """ Saves all important information about a model along with the checkpoint data
+    :param model: model for which checkpoint is being created
+    :param class_to_index: map containing class values to indexes
+    :param optimizer: optimizer used along with current model
+    :param epochs: number of epochs used to train the model
+    :param outputs: number of output units
+    :param hidden_layers: list of hidden layer inputs
+    :param dropout: used during training for all classifier layers (except output layer)
+    :param architecture: supported architecture used by this model
+    :param checkpoint_dir: location where this checkpoint will be stored
+    """
     inputs = None
     if architecture == icc.SUPPORTED_ARCHITECTURES[icc.ALEXNET]:
         inputs = model.classifier.fc1.in_features
@@ -156,15 +163,11 @@ def save_checkpoint(model, class_to_index, optimizer, epochs, outputs, hidden_la
 def load_checkpoint(file_path, device):
     """ Loads a checkpoint onto a new model based on the checkpoint's configuration
 
-        Arguments
-        ---------
-        file_path: path containing the checkpoint file
-        device: string that determines where to load the model/checkpoint: 'cuda' vs 'cpu'
+        :param file_path: path containing the checkpoint file
+        :param device: string that determines where to load the model/checkpoint: 'cuda' vs 'cpu'
 
-        Returns
-        -------
-        model: A pre-trained model with a state derived from the provided checkpoint
-        checkpoint: The checkpoint used to load the model in case the caller needs additional stored information
+        :return:  (model, checkpoint) pre-trained model with a state derived from the provided checkpoint,
+        and the checkpoint used to load the model in case the caller needs additional stored information
     """
 
     device = device.lower()
@@ -188,4 +191,3 @@ def load_checkpoint(file_path, device):
         pretrained_model = pretrained_model.to(torch.device(device))
 
     return pretrained_model, checkpoint
-

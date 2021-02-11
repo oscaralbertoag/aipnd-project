@@ -9,6 +9,9 @@ import torch
 
 
 def create_validation_transform():
+    """ Creates a transformation to be used for validations and testing
+    :return: transformations (resize, center crop, normalization)
+    """
     return transforms.Compose([transforms.Resize(255),
                                transforms.CenterCrop(224),
                                transforms.ToTensor(),
@@ -17,6 +20,9 @@ def create_validation_transform():
 
 
 def create_training_transform():
+    """ Creates a transformation to be used for training
+    :return:  transformations (random rotation, resizing, cropping, flipping, and normalization)
+    """
     return transforms.Compose([transforms.RandomRotation(30),
                                transforms.RandomResizedCrop(224),
                                transforms.RandomHorizontalFlip(),
@@ -26,6 +32,11 @@ def create_training_transform():
 
 
 def load_data(data_dir, data_type):
+    """ Loads data from a specific directory to be used in training, validation, or testing
+    :param data_dir: location of data to load
+    :param data_type: type of data to load (train, valid, test)
+    :return: (data_loader, dataset) loaded data in batches of 32
+    """
     if data_type not in icc.DIRECTORIES:
         raise Exception(f"Invalid data type: {data_type}. Options: {icc.DIRECTORIES}")
 

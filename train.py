@@ -16,10 +16,7 @@ import json
 
 def get_train_arguments():
     """ Fetches all necessary inputs from the user
-
-        Returns
-        -------
-        Namespace object containing all key-value pairs for user input arguments
+        :return: namespace object containing all key-value pairs for user input arguments
     """
 
     parser = argparse.ArgumentParser(description='Trains an image classifier')
@@ -51,22 +48,16 @@ def get_train_arguments():
     return parser.parse_args()
 
 
-
 def validate(model, criterion, validation_dataloader, device):
-    ''' Runs through validation data and calculates and returns loss and accuracy
+    """ Runs through validation data and calculates and returns loss and accuracy
+        :param model: model to validate
+        :param criterion: used to calculate model validation loss
+        :param validation_dataloader: dataloader for validation data
+        :param device: 'cpu' or 'gpu'
 
-        Arguments
-        ---------
-        model: model to validate
-        criterion: used to calculate model validation loss
-        validation_dataloader: dataloader for validation data
-        device: 'cpu' or 'gpu'
-
-        Returns
-        -------
-        accuracy: calculated accuracy for all validation data
-        validation_loss: calculated loss for all validation data
-    '''
+        :return: (accuracy, validation_loss) calculated accuracy for all validation data, and calculated loss for all
+        validation data
+    """
     # Put model in 'evaluation' mode
     model.eval()
 
@@ -94,24 +85,20 @@ def validate(model, criterion, validation_dataloader, device):
 
 
 def train(model, device, epochs, optimizer, criterion, training_dataloader, validation_dataloader, print_every=0):
-    ''' Trains the provided model with the following arguments:
+    """ Trains the provided model with the following arguments:
 
-        Arguments
-        ---------
-        model: model to be used to train
-        device: 'cpu' or 'gpu'
-        epochs: number of training iterations over the entire learning dataset
-        optimizer: optimizer to be used to update weights after backpropagation (already configured with a learn rate)
-        criterion: used to calculate model loss and execute backpropagation
-        training_dataloader: dataloader for training data
-        validation_dataloader: dataloader for validation data
-        print_every: will print intermediate step stats if provided value > 0. Defaults to zero (no intermediate printing)
+        :param model: model to be used to train
+        :param device: 'cpu' or 'gpu'
+        :param epochs: number of training iterations over the entire learning dataset
+        :param optimizer: optimizer to be used to update weights after backpropagation (already configured with a learn rate)
+        :param criterion: used to calculate model loss and execute backpropagation
+        :param training_dataloader: dataloader for training data
+        :param validation_dataloader: dataloader for validation data
+        :param print_every: will print intermediate step stats if provided value > 0. Defaults to zero (no intermediate printing)
 
-        Returns
-        -------
-        train_losses: list of all training loss values that can be used in plots
-        validation_losses: list of all validation loss values that can be used in plots
-    '''
+        :return: (training_losses, validation_losses) list of all training loss values that can be used in plots,
+        and a list of all validation loss values that can be used in plots
+    """
     print(
         f"\n****TRAINING (printing model stats every {print_every} steps)****\n Device: {device}, Epochs: {epochs}, "
         f"Training batches: {len(training_dataloader)},  Validation batches: {len(validation_dataloader)}")
@@ -166,15 +153,13 @@ def train(model, device, epochs, optimizer, criterion, training_dataloader, vali
 
 
 def test(model, criterion, testing_dataloader, device):
-    ''' Iterates through test dataset to verify the accuracy of the trained model
+    """ Iterates through test dataset to verify the accuracy of the trained model
 
-        Arguments
-        ---------
-        model: used for predictions on the test dataset
-        criterion: used to calculate loss
-        testing_dataloader: data loader containing testing dataset
-        device: 'cpu' or 'gpu'
-    '''
+        :param model: used for predictions on the test dataset
+        :param criterion: used to calculate loss
+        :param testing_dataloader: data loader containing testing dataset
+        :param device: 'cpu' or 'gpu'
+    """
 
     model.eval()
     print(f"Testing model (batches: {len(testing_dataloader)})")
