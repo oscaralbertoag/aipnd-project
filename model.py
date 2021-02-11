@@ -2,13 +2,23 @@
 """
 from collections import OrderedDict
 from torchvision import models
-from torch import nn, optim
+from torch import nn
 import uuid
 import image_classifier_constants as icc
 import torch
 
 """ ------------- Functions -------------
 """
+
+
+def determine_device(gpu_selected):
+    if gpu_selected and torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
+        if gpu_selected: print("WARN: CUDA is not available. Using CPU instead")
+
+    return device
 
 
 def freeze_pretrained_model_params(pretrained_model):
@@ -120,11 +130,11 @@ def save_checkpoint(model, class_to_index, optimizer, epochs, outputs, hidden_la
                     checkpoint_dir):
     inputs = None
     if architecture == icc.SUPPORTED_ARCHITECTURES[icc.ALEXNET]:
-        inputs = model.classifier[0].in_features
+        inputs = model.classifier.fc1.in_features
     elif architecture == icc.SUPPORTED_ARCHITECTURES[icc.VGG19_BN]:
-        inputs = model.classifier[1].in_features
+        inputs = model.classifier.fc1.in_features
     elif architecture == icc.SUPPORTED_ARCHITECTURES[icc.RESNET_50]:
-        inputs = model.fc.in_features
+        inputs = model.fc.fc1.in_features
 
     checkpoint = {'state_dict': model.state_dict(),
                   'class_to_index': class_to_index,
@@ -143,11 +153,63 @@ def save_checkpoint(model, class_to_index, optimizer, epochs, outputs, hidden_la
     print(f"Saved checkpoint at {full_path}")
 
 
+def load_checkpoint(file_path, device):
+    ''' Loads a checkpoint onto a new model based on the checkpoint's configuration
+
+        Arguments
+        ---------
+        file_path: path containing the checkpoint file
+        device: string that determines where to load the model/checkpoint: 'cuda' vs 'cpu'
+
+        Returns
+        -------
+        model: A pre-trained model with a state derived from the provided checkpoint
+        checkpoint: The checkpoint used to load the model in case the caller needs additional stored information
+    '''
+
+    valid_devices = ['cpu', 'cuda']
+    device = device.lower()
+    if device not in valid_devices:
+        raise Exception(f"Invalid device '{device}'! Valid options are: {valid_devices}")
+
+    checkpoint = None
+    pretrained_model = None
+
+    if device == 'cpu':
+        checkpoint = torch.load(file_path, map_location=device)
+        pretrained_model = build_model(checkpoint['architecture'],
+                                       checkpoint['hidden_layers'],
+                                       checkpoint['outputs'],
+                                       checkpoint['dropout'])
+        pretrained_model.load_state_dict(checkpoint['state_dict'])
+    else:
+        checkpoint = torch.load(file_path)
+        pretrained_model = build_model(checkpoint['architecture'],
+                                       checkpoint['hidden_layers'],
+                                       checkpoint['outputs'],
+                                       checkpoint['dropout'])
+        pretrained_model.load_state_dict(checkpoint['state_dict'])
+        pretrained_model = pretrained_model.to(torch.device(device))
+
+    return pretrained_model, checkpoint
+
+
 def main():
     vgg19 = models.vgg19_bn(pretrained=True)
     alexnet = models.alexnet(pretrained=True)
+    resnet50 = models.resnet50(pretrained=True)
+    print("ORIGINAL PRE-TRAINED")
     print(f"VGG19: \n {vgg19}\n")
-    print(f"Alexnet: \n {alexnet}\n")
+    print(f"AlexNet: \n {alexnet}\n")
+    print(f"ResNet50: \n {resnet50}\n")
+
+    print("\nMODIFIED PRE-TRAINED (REPLACED CLASSIFIERS)\n")
+    vgg19_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.VGG19_BN], [600, 400], 102, 0.2, True)
+    alexNet_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.ALEXNET], [600, 400], 102, 0.2, True)
+    resnet50_a = build_model(icc.SUPPORTED_ARCHITECTURES[icc.RESNET_50], [600, 400], 102, 0.2, True)
+    print(f"VGG19: \n {vgg19_a}\n")
+    print(f"AlexNet: \n {alexNet_a}\n")
+    print(f"ResNet50: \n {resnet50_a}\n")
 
 
 if __name__ == '__main__':

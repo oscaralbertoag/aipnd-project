@@ -25,7 +25,8 @@ def get_train_arguments():
     parser = argparse.ArgumentParser(description='Trains an image classifier')
 
     parser.add_argument('data_directory', type=str, default='flowers',
-                        help="directory containing all data to be used to train a model. Expects this directory to contain: 'train', 'valid', and 'test' directories")
+                        help="directory containing all data to be used to train a model. Expects this directory to "
+                             "contain: 'train', 'valid', and 'test' directories")
     parser.add_argument('--save_dir', type=str, default='saved-checkpoints',
                         help='custom directory to save model checkpoints')
     parser.add_argument('--arch', type=str, default=icc.SUPPORTED_ARCHITECTURES[icc.RESNET_50],
@@ -34,28 +35,21 @@ def get_train_arguments():
     parser.add_argument('--learning_rate', type=float, default=0.0003,
                         help='set the learning rate to be used; defaults to 0.0003')
     parser.add_argument('--hidden_units', type=int, nargs='+', default=[512],
-                        help='list of hidden units to use; for example, if 1024 and 512 are provided, the resulting feed-forward classifier will have 2 hidden layers')
+                        help='list of hidden units to use; for example, if 1024 and 512 are provided, the resulting '
+                             'feed-forward classifier will have 2 hidden layers')
     parser.add_argument('--epochs', type=int, default=8,
                         help='number of epochs to train; defaults to 8')
     parser.add_argument('--gpu', default=False, nargs='?', const=True,
                         help='if present, GPU will be used to train the model; defaults to CPU')
     parser.add_argument('--print_every', type=int, default=100,
-                        help='how many steps between printing model stats (e.g. accuracy, loss); a smaller number will slow down processing. Defaults to 100')
+                        help='how many steps between printing model stats (e.g. accuracy, loss); a smaller number '
+                             'will slow down processing. Defaults to 100')
     parser.add_argument('--test', default=False, nargs='?', const=True,
-                        help='if present, run model through testing datapoints after training; skips testing cycle by default')
+                        help='if present, run model through testing datapoints after training; skips testing cycle by '
+                             'default')
 
     return parser.parse_args()
 
-
-def determine_device(gpu_selected):
-    device = None
-    if gpu_selected and torch.cuda.is_available():
-        device = "cuda"
-    else:
-        device = "cpu"
-        if gpu_selected: print("WARN: CUDA is not available. Using CPU instead")
-
-    return device
 
 
 def validate(model, criterion, validation_dataloader, device):
@@ -119,7 +113,8 @@ def train(model, device, epochs, optimizer, criterion, training_dataloader, vali
         validation_losses: list of all validation loss values that can be used in plots
     '''
     print(
-        f"\n****TRAINING (printing model stats every {print_every} steps)****\n Device: {device}, Epochs: {epochs}, Training batches: {len(training_dataloader)},  Validation batches: {len(validation_dataloader)}")
+        f"\n****TRAINING (printing model stats every {print_every} steps)****\n Device: {device}, Epochs: {epochs}, "
+        f"Training batches: {len(training_dataloader)},  Validation batches: {len(validation_dataloader)}")
 
     model.train()
     step = 0
@@ -220,7 +215,7 @@ def main():
     epochs = user_input.epochs
     learn_rate = user_input.learning_rate
     print_every = user_input.print_every
-    device = torch.device(determine_device(user_input.gpu))
+    device = torch.device(m.determine_device(user_input.gpu))
 
     with open('cat_to_name.json', 'r') as f:
         cat_to_name = json.load(f)
