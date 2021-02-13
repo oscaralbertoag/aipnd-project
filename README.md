@@ -1,6 +1,6 @@
-# AI Programming with Python Project
+# Part 2 - AI Programming with Python (Udacity Nanodegree Program)
 
-Project code for Udacity's AI Programming with Python Nanodegree program. In this project, students first develop code for an image classifier built with PyTorch, then convert it into a command line application.
+Project code for the final project for Udacity's AI Programming with Python Nanodegree program (part 1 code can be found [HERE](https://github.com/oscaralbertoag/ai-programming-with-python)). In this project, students first develop code for an image classifier built with PyTorch, then convert it into a command line application.
 
 ## Part 1 - Jupyter Notebook
 Complete the included Jupyter notebook and submit as an `HTML` file
